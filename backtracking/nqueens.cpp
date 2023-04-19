@@ -17,7 +17,7 @@ public:
     vector<vector<string>> solveNQueens(int num_threads, int n) {
         vector<string> board(n, string(n, '.'));
         // backtracking(0, 0, n, board);
-        // printf("Solutions to find: %d\n", queens_to_find);
+        printf("Solutions to find: %d\n", queens_to_find);
         #pragma omp parallel num_threads(num_threads)
         loadBalance_v2(num_threads, n);
         // loadBalance(num_threads, n);
@@ -159,9 +159,11 @@ int main(int argc, char** argv) {
     sscanf(argv[2], "%d", &num_queens);
     Solution s;
     s.queens_to_find = INT_MAX;
-    s.solveNQueens(num_threads, num_queens);
+    
     if (argc == 4) {
         sscanf(argv[3], "%d", &sol_to_find);
+        s.queens_to_find = sol_to_find;
     }
+    s.solveNQueens(num_threads, num_queens);
     cout << "Solution found: " << s.res.size() << endl;
 }
