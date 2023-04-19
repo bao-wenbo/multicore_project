@@ -1,5 +1,3 @@
-// Code Source: https://rosettacode.org/wiki/N-queens_problem#C++
-
 // Much shorter than the version below;
 // uses C++11 threads to parallelize the computation; also uses backtracking
 // Outputs all solutions for any table size
@@ -64,7 +62,7 @@ static void n_queens(std::vector<int> &pos, int index)
 	if (index >= pos.size()) {
 		if (good(pos, index)) {
 			std::lock_guard<std::mutex> lock(print_count_mutex);
-			print(pos);
+			// print(pos);
 			n_sols++;
 		}
 
@@ -96,9 +94,13 @@ static void n_queens(std::vector<int> &pos, int index)
 	}
 }
 
-int main()
+int main(int argc, char** argv)
 {
-	std::vector<int> start(12); // 12: table size
+    // int num_threads = 0;
+    int num_queens = 12;
+    // sscanf(argv[1], "%d", &num_threads);
+    sscanf(argv[1], "%d", &num_queens);
+	std::vector<int> start(num_queens); // 12: table size
 	n_queens(start, 0);
 	std::cout << n_sols << " solutions found.\n";
 	return 0;
