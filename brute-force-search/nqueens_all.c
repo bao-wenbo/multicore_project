@@ -1,4 +1,4 @@
-
+// followed https://github.com/victoraldecoa/N-Queens-Solver_OpenMP_Example/blob/master/src/nqueens-openmp.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -37,25 +37,29 @@ int main(int argc, char* argv[])
     double start_time, end_time;
     int number_solutions = 0;
         
-	{
-	    int num_workers;
-        int i;
-	
-        n = (argc > 1) ? atoi(argv[1]) : 8;
-        num_workers = (argc > 2) ? atoi(argv[2]) : 30;
+
+    int num_workers;
+    int i;
+
+    n = (argc > 1) ? atoi(argv[1]) : 8;
+    num_workers = (argc > 2) ? atoi(argv[2]) : 30;
+    
         
-        omp_set_num_threads(num_workers);
-	        
-        for (i = 0; i < n; i++)
-        {
-            max_iter *= n;
-        }
+    for (i = 0; i < n; i++)
+    {
+        max_iter *= n;
     }
   
     start_time = omp_get_wtime();
     
 	long iter;
-#pragma omp parallel for
+
+#pragma omp parallel num_threads(num_workers) \
+	default(none) shared(number_solutions, n, max_iter) \
+	private(iter)
+
+
+#pragma omp for
 	for (iter = 0; iter < max_iter; iter++)
 	{
 		long code = iter;
@@ -72,14 +76,8 @@ int main(int argc, char* argv[])
 		
 		if (check_acceptable(queen_rows, n))
 		{
-#pragma omp critical
-            {
-            	number_solutions++;
-                if (!solution_found) {
-                    solution_found = true;
-                    std::cout << "Solution found by thread " << omp_get_thread_num() << " for i = " << i << std::endl;
-                }
-            }
+#pragma omp atomic
+            number_solutions++;
 		}
 	}
     // get end time
