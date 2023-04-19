@@ -1,0 +1,85 @@
+➜  project ./sa
+target 1
+num_threads 1
+N 25,Time 0.729313 sec.
+N 50,Time 2.240239 sec.
+N 60,Time 1.943194 sec.
+N 80,Time 5.591333 sec.
+N 100,Time 16.915692 sec.
+target 1
+num_threads 5
+N 25,Time 0.082970 sec.
+N 50,Time 0.259912 sec.
+N 60,Time 0.399319 sec.
+N 80,Time 0.875223 sec.
+N 100,Time 1.709439 sec.
+target 1
+num_threads 10
+N 25,Time 0.151763 sec.
+N 50,Time 0.285984 sec.
+N 60,Time 0.442617 sec.
+N 80,Time 0.912848 sec.
+N 100,Time 2.089435 sec.
+target 1
+num_threads 20
+N 25,Time 0.294934 sec.
+N 50,Time 0.620781 sec.
+N 60,Time 0.782317 sec.
+N 80,Time 1.182559 sec.
+N 100,Time 1.800461 sec.
+target 3
+num_threads 1
+N 25,Time 3.458084 sec.
+N 50,Time 9.830045 sec.
+N 60,Time 10.952541 sec.
+N 80,Time 18.610976 sec.
+N 100,Time 19.789309 sec.
+target 3
+num_threads 5
+N 25,Time 0.107651 sec.
+N 50,Time 0.280741 sec.
+N 60,Time 0.602204 sec.
+N 80,Time 1.700992 sec.
+N 100,Time 3.467181 sec.
+target 3
+num_threads 10
+N 25,Time 0.166756 sec.
+N 50,Time 0.386553 sec.
+N 60,Time 0.476391 sec.
+N 80,Time 0.965687 sec.
+N 100,Time 2.181015 sec.
+target 3
+num_threads 20
+N 25,Time 0.319490 sec.
+N 50,Time 0.617797 sec.
+N 60,Time 0.770833 sec.
+N 80,Time 1.142895 sec.
+N 100,Time 2.024026 sec.
+target 5
+num_threads 1
+N 25,Time 6.330174 sec.
+N 50,Time 19.065769 sec.
+N 60,Time 14.590185 sec.
+N 80,Time 33.482229 sec.
+N 100,Time 52.280438 sec.
+target 5
+num_threads 5
+N 25,Time 0.137977 sec.
+N 50,Time 0.553938 sec.
+N 60,Time 0.800306 sec.
+N 80,Time 2.643357 sec.
+N 100,Time 5.431794 sec.
+target 5
+num_threads 10
+N 25,Time 0.246858 sec.
+N 50,Time 0.353867 sec.
+N 60,Time 0.782534 sec.
+N 80,Time 1.434656 sec.
+N 100,Time 2.321913 sec.
+target 5
+num_threads 20
+N 25,Time 0.347879 sec.
+N 50,Time 0.751863 sec.
+N 60,Time 0.919480 sec.
+N 80,Time 1.373499 sec.
+N 100,Time 2.312602 sec.

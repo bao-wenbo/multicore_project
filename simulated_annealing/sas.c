@@ -3,15 +3,14 @@
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
-#include <omp.h>
 #include <inttypes.h>
 #include <sys/time.h>
-// gcc -fopenmp -Wall  sa.c -std=c99 -o sa -lm
-// ./sa 
-#define MAX_ATTAMPT_ALPHA 100
-#define MAX_TEMPERATURE 100 
-#define MIN_TEMPERATURE 0.0001 
-#define COOL_RATE 0.95 
+// gcc sas.c -std=c99 -o sas
+// ./sas
+#define MAX_ITERATIONS 100
+#define TEMP_INITIAL 100 
+#define TEMP_MINIMUM 0.0001 
+#define COOLING_RATE 0.95 
 
 int num_threads = 4;
 unsigned int seed; // Seed for rand_r()
@@ -27,8 +26,7 @@ void shuffle(int arr[], int size) {
         swap_queens(i, j, arr);
     }
 }
-void init_chessboard(int* queens, int N) {
-    #pragma omp parallel for num_threads(num_threads)
+void initializeBoard(int* queens, int N) {
     for (int i = 0; i < N; i++) {
         queens[i] = i;
     }
@@ -37,7 +35,6 @@ void init_chessboard(int* queens, int N) {
 
 int get_conflicts_count(int *queens, int N) {
     int conflicts_count = 0;
-    #pragma omp parallel for num_threads(num_threads) reduction(+:conflicts_count)
     for (int i = 0; i < N; i++) {
         for (int j = i + 1; j < N; j++) {
             if (queens[i] == queens[j] || abs(queens[i] - queens[j]) == abs(i - j)) {
@@ -59,37 +56,39 @@ bool accept(int current_conflicts, int new_conflicts, double temperature){
 
 void simulated_annealing(int N,int target,int num_threads){
     int find_counters = 0;
-    #pragma omp parallel num_threads(num_threads) shared(find_counters)
-    {
+
         while(find_counters<target){
 
             int* queens;
             queens = (int*)malloc(N * sizeof(int));
-            init_chessboard(queens,N);
+            initializeBoard(queens,N);
             // for (int i = 0; i < N; i++) {
             //     printf("%d ", queens[i]);
             // }
-            double temperature = MAX_TEMPERATURE; 
+            double temperature = TEMP_INITIAL; 
             int current_conflicts = get_conflicts_count(queens,N);
 
             int best_conflicts = current_conflicts; 
         
-            for (int i = 0; i < MAX_ATTAMPT_ALPHA*N && current_conflicts > 0 && temperature > MIN_TEMPERATURE&&find_counters<target; i++) 
+            for (int i = 0; i < MAX_ITERATIONS*N && current_conflicts > 0 && temperature > TEMP_MINIMUM&&find_counters<target; i++) 
             {
-                // randomly choose queens to swap
-                int xi = rand() % N;
-                int xj = rand() % N;
-                while (xj == queens[xi]) {
-                    xj = rand() % N;
+            
+                for (int queen = 0; queen < N; queen++) {
+
+                    // randomly choose queens to swap
+                    int xi = rand() % N;
+                    int xj = rand() % N;
+                    while (xj == queens[xi]) {
+                        xj = rand() % N;
+                    }
+                    swap_queens(xi, xj, queens);
+                    int new_conflicts = get_conflicts_count(queens, N);
+                    if (accept(current_conflicts, new_conflicts,temperature)) {
+                        current_conflicts = new_conflicts;
+                    } else {
+                        swap_queens(xi, xj, queens); // Undo the move
+                    }
                 }
-                swap_queens(xi, xj, queens);
-                int new_conflicts = get_conflicts_count(queens, N);
-                if (accept(current_conflicts, new_conflicts,temperature)) {
-                    current_conflicts = new_conflicts;
-                } else {
-                    swap_queens(xi, xj, queens); // Undo the move
-                }
-                
 
 
                 if (current_conflicts < best_conflicts) {
@@ -97,19 +96,15 @@ void simulated_annealing(int N,int target,int num_threads){
 
                 }
                 if (best_conflicts == 0) {
-                    #pragma omp critical
-                    {
                         find_counters++; // find one solution
                         // printf("%d/%d solutions found:\n",find_counters,target);
                         // for (int i = 0; i < N; i++) {
                         //     printf("%d ", best_queens[i]);
                         // }
                         // printf("\n");
-
-                    }
                 }
                 // Cool the temperature
-                temperature *= COOL_RATE;
+                temperature *= COOLING_RATE;
 
                 
             }
@@ -119,10 +114,13 @@ void simulated_annealing(int N,int target,int num_threads){
 
         }
     
-    }
 
 } 
-
+double get_time() {
+  struct timeval tp;
+  gettimeofday(&tp, NULL);
+  return tp.tv_sec + tp.tv_usec / 1000000.0;
+}
 int main(int argc , char **argv) 
 {
     // int target = 1;
@@ -132,6 +130,18 @@ int main(int argc , char **argv)
     int targets[] = {1,3,5};
     int threads[] = {1,5,10,20};
     int run_times = 5;
+    // if (argc == 2) {
+    //     target = atoi(argv[1]);
+
+
+    // }
+    // else if (argc == 3) {
+    //     target = atoi(argv[1]);
+    //     num_threads=atoi(argv[2]);
+    //     printf("target %d\n",target);
+    //     printf("num_threads %d\n",num_threads);
+
+    // }
     
     int length = sizeof(Ns) / sizeof(Ns[0]);
     for (int target_i=0;target_i<3;target_i++)
@@ -143,14 +153,14 @@ int main(int argc , char **argv)
         
             for (int i = 0; i < length; i++) {
                 double time_diff, time_start;
-                time_start = omp_get_wtime();
+                time_start = get_time();
                 srand(time(NULL));
                 seed = rand(); 
                 for (int run_times_i = 0; run_times_i < run_times; run_times_i++) {
                     simulated_annealing(Ns[i],targets[target_i],threads[thread_i]);
                 }
                 
-                time_diff = (omp_get_wtime() - time_start)/run_times;
+                time_diff = (get_time() - time_start)/run_times;
 
                 printf("N %2d,Time %f sec.\n", Ns[i], time_diff);
             }
