@@ -89,11 +89,11 @@ class NQueenSolver {
         }
 
         void initializeFirstGeneration() {
-            int max_population = fact(size);
-            if (population_size > max_population && max_population != 0) {
-                printf("Population Size larger than maximum possible combination of N. Adjust to maximum %d\n", max_population);
-                population_size = max_population;
-            }
+            // int max_population = fact(size);
+            // if (population_size > max_population && max_population != 0) {
+            //     printf("Population Size larger than maximum possible combination of N. Adjust to maximum %d\n", max_population);
+            //     population_size = max_population;
+            // }
 
             #pragma omp parallel for shared(population)
             for (int i = 0; i < population_size; i++) {
